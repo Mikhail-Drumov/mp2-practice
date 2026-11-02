@@ -1,30 +1,37 @@
-#ifndef __TVectorStack_H__
-#define __TVectorStack_H__
+#ifndef __TDynamicStack_H__
+#define __TDynamicStack_H__
 
 #include <iostream>
-#include <vector>
 
 template<typename T>
-class TVectorStack {
-	std::vector<T> mem;
+class TDynamicStack {
+	int top;
+	size_t memSize;
+	T* pMem;
 public:
-	TVectorStack() = default;
+	TDynamicStack(size_t _memSize = 1) : top(-1), memSize(_memSize), pMem(new T[memSize]) {}
+	TDynamicStack(const TDynamicStack&) = delete;
+	const TDynamicStack& operator=(const TDynamicStack&) = delete;
+	~TDynamicStack()		{ delete[] pMem; }
 
-	TVectorStack(const TVectorStack&) = delete;
-	const TVectorStack& operator=(const TVectorStack&) = delete;
-		
-	size_t size() const { return mem.size(); }
-	bool IsEmpty() const { return mem.empty(); }
-	void Push(const T& val) { mem.push_back(val); }
-	void Pop() {
-		if (mem.empty())
-			throw std::exception("Pop from empty stack prohibited");
-		mem.pop_back();
-	}
+	size_t size() const		{ return top + 1; }
+	bool IsEmpty() const	{ return top == -1; }
+	bool IsFull() const		{ return top == memSize - 1; }
+
 	T Top() const {
-		if (mem.empty())
-			throw std::exception("Getting top of empty stack prohibited");
-		return mem.back();
+		if (IsEmpty())
+			throw std::exception("Getting top of empty stack is disallowed");
+		return pMem[top];
+	}
+	void Pop() {
+		if (IsEmpty())
+			throw std::exception("Popping from empty stack is disallowed");
+		top--;
+	}
+	void Push(const T& val) {
+		if (IsFull())
+			throw std::exception("Pushing to full stack is disallowed");
+		pMem[++top] = val;
 	}
 };
 
